@@ -12,11 +12,11 @@ Date:    2022/03/10
 from typing import Callable
 import time
 import numpy as np
-import paddle
-import paddle.nn as nn
+import torch
+import torch.nn as nn
 import random
-from paddle.io import DataLoader
-from model import SCINet
+from torch.utils.data import DataLoader
+from multires
 from wind_turbine_data import WindTurbineDataset
 
 
@@ -43,10 +43,14 @@ def adjust_learning_rate(optimizer, epoch, args):
             2: 5e-5, 4: 1e-5, 6: 5e-6, 8: 1e-6,
             10: 5e-7, 15: 1e-7, 20: 5e-8
         }
-    if epoch in lr_adjust:
+    if epoch in lr_adjust.keys():
         lr = lr_adjust[epoch]
-        optimizer.set_lr(lr)
-
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+        print('Updating learning rate to {}'.format(lr))
+    else:
+        for param_group in optimizer.param_groups:
+            lr = param_group['lr']
 
 class EarlyStopping(object):
     """
@@ -222,16 +226,16 @@ class Experiment(object):
         Returns:
             prediction and ground truth
         """
-        batch_x = batch_x.astype('float32')
-        batch_y = batch_y.astype('float32')
+        batch_x = batch_x.float()
+        batch_y = batch_y.float()
         sample = self.model(batch_x)
         #
         # If the task is the multivariate-to-univariate forecasting task,
         # the last column is the target variable to be predicted
         f_dim = -1 if self.args["task"] == 'MS' else 0
         #
-        batch_y = batch_y[:, -self.args["output_len"]:, f_dim:].astype('float32')
-        sample = sample[..., :, f_dim:].astype('float32')
+        batch_y = batch_y[:, -self.args["output_len"]:, f_dim:].float()
+        sample = sample[..., :, f_dim:].float()
         return sample, batch_y
 
 
@@ -268,7 +272,7 @@ def traverse_wind_farm(method, params, model_path, flag='train'):
             responses.append(res)
         else:
             pass
-        paddle.device.cuda.empty_cache()
+        torch.cuda.empty_cache()
         if params["is_debug"]:
             end_time = time.time()
             print("Elapsed time for {} turbine {} is {} secs".format("training" if "train" == flag else "predicting", i,
