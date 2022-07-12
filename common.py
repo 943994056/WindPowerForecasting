@@ -82,7 +82,7 @@ class EarlyStopping(object):
         """
         self.best_model = True
         self.val_loss_min = val_loss
-        paddle.save(model.state_dict(), path + '/' + 'model_' + str(tid))
+        torch.save(model.state_dict(), path + '/' + 'model_' + str(tid))
 
     def __call__(self, val_loss, model, path, tid):
         # type: (nn.MSELoss, BaselineGruModel, str, int) -> None
