@@ -10,7 +10,7 @@ Authors: Lu,Xinjiang (luxinjiang@baidu.com)
 Date:    2022/03/10
 """
 import os
-import paddle
+import torch
 import numpy as np
 from common import Experiment
 from common import traverse_wind_farm
@@ -31,15 +31,16 @@ def forecast_one(experiment, model_folder):
     args = experiment.get_args()
     model = experiment.get_model()
     path_to_model = os.path.join(args["checkpoints"], model_folder, 'model_0')#.format(str(args["turbine_id"])))
-    model.set_state_dict(paddle.load(path_to_model))
+    model.load_state_dict(torch.load(path_to_model))
 
     test_data, test_loader = experiment.get_data(flag='test')
     predictions = []
     true_lst = []
     for i, (batch_x, batch_y) in enumerate(test_loader):
         sample, true = experiment.process_one_batch(batch_x, batch_y)
-        predictions.append(np.array(sample))
-        true_lst.append(np.array(true))
+        predictions.append(sample.detach().numpy())
+        true_lst.append(true.detach().numpy())
+    
     predictions = np.array(predictions)
     true_lst = np.array(true_lst)
     predictions = predictions.reshape(-1, predictions.shape[-2], predictions.shape[-1])
