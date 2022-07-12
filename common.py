@@ -197,10 +197,9 @@ class Experiment(object):
         Returns:
             An optimizer
         """
-        clip = paddle.nn.ClipGradByNorm(clip_norm=50.0)
-        model_optim = paddle.optimizer.Adam(parameters=self.model.parameters(),
-                                            learning_rate=self.args["lr"],
-                                            grad_clip=clip)
+        clip = torch.nn.utils.clip_grad_norm_(self.model.parameters(),max_norm=50.0)
+        model_optim = torch.optim.Adam(self.model.parameters(),
+                                            lr=self.args["lr"])
         return model_optim
 
     @staticmethod
