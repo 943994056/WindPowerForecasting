@@ -12,8 +12,8 @@ Date:    2022/03/10
 import os
 import numpy as np
 import pandas as pd
-import paddle
-from paddle.io import Dataset
+import torch
+from torch.utils.data.dataset import Dataset
 
 
 class Scaler(object):
@@ -47,8 +47,8 @@ class Scaler(object):
         Returns:
             The transformed data
         """
-        mean = paddle.to_tensor(self.mean).type_as(data).to(data.device) if paddle.is_tensor(data) else self.mean
-        std = paddle.to_tensor(self.std).type_as(data).to(data.device) if paddle.is_tensor(data) else self.std
+        mean = torch.tensor(self.mean).type_as(data).to(data.device) if torch.is_tensor(data) else self.mean
+        std = torch.tensor(self.std).type_as(data).to(data.device) if torch.is_tensor(data) else self.std
         return (data - mean) / std
 
     def inverse_transform(self, data):
@@ -61,8 +61,8 @@ class Scaler(object):
         Returns:
             The original data
         """
-        mean = paddle.to_tensor(self.mean) if paddle.is_tensor(data) else self.mean
-        std = paddle.to_tensor(self.std) if paddle.is_tensor(data) else self.std
+        mean = torch.tensor(self.mean) if torch.is_tensor(data) else self.mean
+        std = torch.tensor(self.std) if torch.is_tensor(data) else self.std
         return (data * std) + mean
 
 
