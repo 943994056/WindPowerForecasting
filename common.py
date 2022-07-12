@@ -16,7 +16,7 @@ import torch
 import torch.nn as nn
 import random
 from torch.utils.data import DataLoader
-from multires
+from multires import Multi_Res
 from wind_turbine_data import WindTurbineDataset
 
 
@@ -126,7 +126,7 @@ class Experiment(object):
         Args:
             args: the arguments to initialize the experimental environment
         """
-        self.model = SCINet(args)
+        self.model = Multi_Res(args)
         self.args = args
 
     def get_model(self):
