@@ -13,7 +13,7 @@ import os
 import time
 import numpy as np
 from typing import Callable
-from paddle.io import DataLoader
+from torch.utils.data.dataloader import DataLoader
 from common import EarlyStopping
 from common import adjust_learning_rate
 from common import Experiment
@@ -74,13 +74,14 @@ def train_and_val(experiment, model_folder, is_debug=False):
         train_loss = []
         model.train()
         for i, (batch_x, batch_y) in enumerate(train_loader):
+            model_optim.zero_grad()
             iter_count += 1
             sample, truth = experiment.process_one_batch(batch_x, batch_y)
             sample[truth == 0] = 0
             loss = criterion(sample, truth)
             train_loss.append(loss.item())
             loss.backward()
-            model_optim.minimize(loss)
+            #model_optim.minimize(loss)
             model_optim.step()
         val_loss = val(experiment, val_loader, criterion)
 
