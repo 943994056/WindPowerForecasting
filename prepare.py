@@ -7,7 +7,7 @@ Authors: Lu,Xinjiang (luxinjiang@baidu.com)
 Date:    2022/03/10
 """
 import argparse
-import paddle
+import torch
 
 
 def prep_env():
@@ -30,7 +30,7 @@ def prep_env():
                                                                'MS: multivariate --> univariate')
     parser.add_argument('--target', type=str, default='Patv', help='Target variable in S or MS task')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='Location of model checkpoints')
-    parser.add_argument('--input_len', type=int, default=720, help='Length of the input sequence')
+    parser.add_argument('--input_len', type=int, default=288, help='Length of the input sequence')
     parser.add_argument('--output_len', type=int, default=288, help='The length of predicted sequence')
     parser.add_argument('--start_col', type=int, default=3, help='Index of the start column of the meaningful variables')
     parser.add_argument('--in_var', type=int, default=10, help='Number of the input variables')
@@ -115,13 +115,16 @@ def prep_env():
         "is_debug": args.is_debug
     }
     ###
-    # Prepare the GPUs
-    if paddle.device.is_compiled_with_cuda():
+    
+    
+    if torch.cuda.is_available():
+        device = torch.device("cuda:0")
+        print("running on the GPU")
         args.use_gpu = True
-        paddle.device.set_device('gpu:{}'.format(args.gpu))
     else:
+        device = torch.device("cpu")
+        print("running on the CPU")
         args.use_gpu = False
-        paddle.device.set_device('cpu')
 
     # if args.use_gpu and args.use_multi_gpu:
     #     args.devices = args.devices.replace(' ', '')
