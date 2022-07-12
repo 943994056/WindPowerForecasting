@@ -241,7 +241,7 @@ class Experiment(object):
 
 fix_seed = 3407
 random.seed(fix_seed)
-paddle.seed(fix_seed)
+torch.seed()
 np.random.seed(fix_seed)
 
 
